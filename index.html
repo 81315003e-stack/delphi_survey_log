@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>德菲法專家問卷 — MIL 館員知能指標研究</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Noto+Serif+TC:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #1a3a5c;
+    --primary-light: #234e7a;
+    --primary-pale: #eaf1f8;
+    --accent: #1e6fa5;
+    --accent2: #2a9d8f;
+    --danger: #c0392b;
+    --warning-bg: #fffbea;
+    --warning-border: #f0c040;
+    --modified-bg: #fff8e1;
+    --deleted-color: #aaa;
+    --card-bg: #fff;
+    --border: #d0dce8;
+    --text: #1a2636;
+    --text-muted: #5a7287;
+    --sidebar-w: 260px;
+    --header-h: 60px;
+    --progress-h: 6px;
+    --radius: 10px;
+    --shadow: 0 2px 12px rgba(26,58,92,0.09);
+    --shadow-hover: 0 4px 20px rgba(26,58,92,0.15);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans TC', sans-serif;
+    background: #f0f4f8;
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* ── INVALID PAGE ── */
+  #invalid-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    flex-direction: column;
+    gap: 16px;
+    background: var(--primary);
+    color: #fff;
+    text-align: center;
+    padding: 40px;
+  }
+  #invalid-page h1 { font-size: 1.8rem; font-weight: 600; }
+  #invalid-page p { opacity: .8; max-width: 400px; }
+
+  /* ── HEADER ── */
+  #app-header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: var(--header-h);
+    background: var(--primary);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    z-index: 200;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    gap: 16px;
+  }
+  #app-header .logo {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  #app-header .expert-badge {
+    background: rgba(255,255,255,0.15);
+    border-radius: 20px;
+    padding: 2px 12px;
+    font-size: 0.82rem;
+    white-space: nowrap;
+  }
+  #progress-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+  #progress-bar-bg {
+    flex: 1;
+    height: var(--progress-h);
+    background: rgba(255,255,255,0.2);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  #progress-bar {
+    height: 100%;
+    background: var(--accent2);
+    border-radius: 3px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+  #progress-text { font-size: 0.8rem; opacity: .85; white-space: nowrap; }
+
+  #hamburger {
+    display: none;
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    padding: 4px;
+    flex-shrink: 0;
+  }
+  #hamburger svg { width: 24px; height: 24px; fill: currentColor; }
+
+  /* ── LAYOUT ── */
+  #layout {
+    display: flex;
+    padding-top: var(--header-h);
+    min-height: 100vh;
+  }
+
+  /* ── SIDEBAR ── */
+  #sidebar {
+    width: var(--sidebar-w);
+    background: var(--primary);
+    color: #fff;
+    position: fixed;
+    top: var(--header-h);
+    left: 0;
+    bottom: 0;
+    overflow-y: auto;
+    z-index: 150;
+    transition: transform 0.3s ease;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.2) transparent;
+  }
+  #sidebar::-webkit-scrollbar { width: 4px; }
+  #sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
+
+  #sidebar nav { padding: 16px 0 40px; }
+  .nav-dim-label {
+    display: block;
+    padding: 8px 18px 4px;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    opacity: .5;
+    font-weight: 600;
+  }
+  .nav-dim-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.82);
+    text-align: left;
+    padding: 9px 18px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.88rem;
+    line-height: 1.4;
+    border-left: 3px solid transparent;
+    transition: all 0.2s;
+  }
+  .nav-dim-btn:hover { background: rgba(255,255,255,0.08); color: #fff; border-left-color: rgba(255,255,255,0.4); }
+  .nav-dim-btn.active { background: rgba(255,255,255,0.13); color: #fff; border-left-color: var(--accent2); font-weight: 600; }
+  .nav-dim-num {
+    min-width: 24px;
+    height: 24px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .nav-dim-btn.active .nav-dim-num { background: var(--accent2); }
+
+  /* ── MAIN ── */
+  #main-content {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    padding: 28px 32px 80px;
+    max-width: 900px;
+  }
+
+  /* ── DIMENSION SECTION ── */
+  .dim-section { margin-bottom: 48px; scroll-margin-top: calc(var(--header-h) + 20px); }
+  .dim-header {
+    background: var(--primary);
+    color: #fff;
+    border-radius: var(--radius) var(--radius) 0 0;
+    padding: 18px 24px 16px;
+    position: relative;
+  }
+  .dim-header h2 {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .dim-header p {
+    font-size: 0.85rem;
+    opacity: .75;
+    line-height: 1.5;
+  }
+
+  /* ── ITEM CARD ── */
+  .item-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-top: none;
+    padding: 22px 24px;
+    transition: box-shadow 0.2s;
+  }
+  .item-card:last-of-type { border-radius: 0 0 var(--radius) var(--radius); }
+  .item-card:hover { box-shadow: var(--shadow); }
+
+  .item-code {
+    display: inline-block;
+    background: var(--primary-pale);
+    color: var(--primary);
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 20px;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+  }
+  .item-competency {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+
+  .field-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  /* indicators list */
+  .indicators-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+  .indicator-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    position: relative;
+  }
+  .indicator-num {
+    min-width: 22px;
+    height: 22px;
+    background: var(--primary-pale);
+    color: var(--primary);
+    border-radius: 50%;
+    font-size: 0.72rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .indicator-text {
+    flex: 1;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    outline: none;
+    transition: all 0.2s;
+    background: #fafcfe;
+    cursor: text;
+    min-height: 28px;
+  }
+  .indicator-text:hover { border-color: var(--accent); background: #fff; }
+  .indicator-text:focus { border-color: var(--accent); background: #fff; box-shadow: 0 0 0 3px rgba(30,111,165,0.1); }
+  .indicator-text.is-modified { background: var(--modified-bg); border-color: var(--warning-border); }
+
+  .modified-badge {
+    display: none;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #fff;
+    background: var(--danger);
+    border-radius: 3px;
+    padding: 1px 5px;
+    white-space: nowrap;
+    align-self: flex-start;
+    margin-top: 5px;
+    flex-shrink: 0;
+  }
+  .indicator-text.is-modified ~ .modified-badge { display: inline-block; }
+
+  /* score */
+  .score-group { margin-bottom: 16px; }
+  .score-scale {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: 6px;
+  }
+  .score-scale label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+  }
+  .score-scale input[type=radio] { display: none; }
+  .score-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    background: #fff;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.18s;
+    user-select: none;
+  }
+  .score-scale label:hover .score-btn { border-color: var(--accent); color: var(--accent); background: var(--primary-pale); }
+  .score-scale input[type=radio]:checked + .score-btn { background: var(--primary); border-color: var(--primary); color: #fff; transform: scale(1.1); }
+  .score-hint { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; }
+
+  /* action checkboxes */
+  .action-group {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .action-check {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    cursor: pointer;
+    font-size: 0.88rem;
+  }
+  .action-check input[type=checkbox] {
+    width: 17px;
+    height: 17px;
+    accent-color: var(--accent);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .action-check.delete-check { color: var(--danger); }
+
+  /* comment */
+  .comment-area {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-family: inherit;
+    font-size: 0.88rem;
+    color: var(--text);
+    resize: vertical;
+    min-height: 70px;
+    transition: border-color 0.2s;
+    background: #fafcfe;
+  }
+  .comment-area:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(30,111,165,0.1); background: #fff; }
+  .comment-area.required-missing { border-color: var(--danger); background: #fff5f5; }
+
+  /* dim comment */
+  .dim-comment-section {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--accent2);
+    border-radius: var(--radius);
+    padding: 18px 24px;
+    margin-top: 12px;
+  }
+  .dim-comment-section .field-label { margin-bottom: 8px; }
+
+  /* ── SUBMIT AREA ── */
+  #submit-area {
+    position: fixed;
+    bottom: 0; left: var(--sidebar-w); right: 0;
+    background: rgba(255,255,255,0.96);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid var(--border);
+    padding: 14px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 14px;
+    z-index: 100;
+  }
+  #submit-btn {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 11px 32px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  #submit-btn:hover { background: var(--primary-light); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(26,58,92,0.3); }
+  #submit-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+  .submit-hint { font-size: 0.82rem; color: var(--text-muted); }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(3px);
+    z-index: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+  .modal-box {
+    background: #fff;
+    border-radius: 14px;
+    padding: 32px;
+    max-width: 480px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    transform: translateY(20px);
+    transition: transform 0.25s;
+  }
+  .modal-overlay.open .modal-box { transform: translateY(0); }
+  .modal-title {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 16px;
+  }
+  .modal-stats {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .stat-pill {
+    flex: 1;
+    min-width: 100px;
+    background: var(--primary-pale);
+    border-radius: 8px;
+    padding: 12px 16px;
+    text-align: center;
+  }
+  .stat-num { font-size: 1.6rem; font-weight: 700; color: var(--primary); display: block; }
+  .stat-label { font-size: 0.75rem; color: var(--text-muted); }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; }
+  .btn-cancel {
+    background: #f0f4f8;
+    color: var(--text-muted);
+    border: none;
+    border-radius: 7px;
+    padding: 9px 20px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-cancel:hover { background: #e0e8f0; }
+  .btn-confirm {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 7px;
+    padding: 9px 24px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-confirm:hover { background: var(--primary-light); }
+  .btn-confirm:disabled { opacity: .5; cursor: not-allowed; }
+
+  /* success modal */
+  .success-icon { font-size: 3rem; margin-bottom: 12px; text-align: center; }
+  .modal-msg { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px; }
+
+  /* error banner */
+  #error-banner {
+    position: fixed;
+    top: calc(var(--header-h) + 12px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--danger);
+    color: #fff;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    z-index: 400;
+    display: none;
+    box-shadow: 0 4px 16px rgba(192,57,43,0.3);
+    max-width: 90%;
+    text-align: center;
+  }
+  #error-banner.show { display: block; }
+
+  /* sidebar overlay mobile */
+  #sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 140;
+  }
+
+  /* deleted style */
+  .item-card.is-deleted { opacity: .6; }
+  .item-card.is-deleted .indicator-text { text-decoration: line-through; color: var(--deleted-color); }
+
+  /* validation highlight */
+  .score-group.missing-score .field-label { color: var(--danger); }
+  .score-group.missing-score .score-btn { border-color: #f1a8a8; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    #hamburger { display: flex; }
+    #sidebar { transform: translateX(-100%); }
+    #sidebar.open { transform: translateX(0); }
+    #sidebar-overlay { display: block; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+    #sidebar-overlay.open { opacity: 1; pointer-events: all; }
+    #main-content { margin-left: 0; padding: 16px 16px 80px; }
+    #submit-area { left: 0; padding: 12px 16px; }
+    .score-btn { width: 32px; height: 32px; font-size: 0.8rem; }
+  }
+</style>
+</head>
+<body>
+
+<div id="invalid-page" style="display:none">
+  <div style="font-size:3rem">🔒</div>
+  <h1>連結無效</h1>
+  <p>您的專家連結無效或已過期，請聯繫研究者取得正確連結。</p>
+</div>
+
+<div id="app-root" style="display:none">
+  <!-- HEADER -->
+  <header id="app-header">
+    <button id="hamburger" aria-label="開啟選單">
+      <svg viewBox="0 0 24 24"><rect y="4" width="24" height="2" rx="1"/><rect y="11" width="24" height="2" rx="1"/><rect y="18" width="24" height="2" rx="1"/></svg>
+    </button>
+    <div class="logo">MIL 館員知能指標 · 德菲法問卷</div>
+    <span class="expert-badge" id="expert-badge">—</span>
+    <div id="progress-wrap">
+      <div id="progress-bar-bg"><div id="progress-bar"></div></div>
+      <span id="progress-text">0 / 0</span>
+    </div>
+  </header>
+
+  <!-- SIDEBAR OVERLAY (mobile) -->
+  <div id="sidebar-overlay"></div>
+
+  <div id="layout">
+    <!-- SIDEBAR -->
+    <aside id="sidebar">
+      <nav id="dim-nav"></nav>
+    </aside>
+
+    <!-- MAIN -->
+    <main id="main-content" id="survey-form">
+      <div id="survey-sections"></div>
+    </main>
+  </div>
+
+  <!-- SUBMIT BAR -->
+  <div id="submit-area">
+    <span class="submit-hint" id="submit-hint">請完成所有評分後送出</span>
+    <button id="submit-btn">送出問卷 →</button>
+  </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal-box">
+    <div class="modal-title">📋 確認送出問卷</div>
+    <div class="modal-stats">
+      <div class="stat-pill"><span class="stat-num" id="stat-modified">0</span><span class="stat-label">指標已修改</span></div>
+      <div class="stat-pill"><span class="stat-num" id="stat-deleted">0</span><span class="stat-label">指標勾選刪除</span></div>
+      <div class="stat-pill"><span class="stat-num" id="stat-scored">0</span><span class="stat-label">題項已評分</span></div>
+    </div>
+    <p style="font-size:.88rem;color:var(--text-muted);margin-bottom:20px;">送出後無法再次修改，請確認您的所有填答正確無誤。</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" id="modal-cancel">返回修改</button>
+      <button class="btn-confirm" id="modal-confirm">確認送出</button>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="modal-overlay" id="success-modal">
+  <div class="modal-box" style="text-align:center">
+    <div class="success-icon">✅</div>
+    <div class="modal-title">問卷已成功送出</div>
+    <p class="modal-msg">感謝您的寶貴意見，您的回覆已記錄完成。<br>如有疑問請聯繫研究者。</p>
+    <div class="modal-actions" style="justify-content:center">
+      <button class="btn-confirm" onclick="document.getElementById('success-modal').classList.remove('open')">關閉</button>
+    </div>
+  </div>
+</div>
+
+<!-- ERROR BANNER -->
+<div id="error-banner"></div>
+
+<script>
+// ─────────────────────────────────────────────
+//  CONFIG
+// ─────────────────────────────────────────────
+const GAS_URL = "https://script.google.com/a/macros/ncl.taipei/s/AKfycby-yO_Df8UcdLqGw3Xqh6zbxcwBBr0u3kX6zUyu2UhfEwJicPB72W2ErhFtBdQATLTW/exec";
+
+const EXPERT_TOKENS = {
+  "TOKEN_A1": "專家A（自行替換）",
+  "TOKEN_A2": "專家B（自行替換）",
+  "TOKEN_A3": "專家C（自行替換）",
+  "TOKEN_A4": "專家D（自行替換）",
+  "TOKEN_A5": "專家E（自行替換）",
+  "TOKEN_A6": "專家F（自行替換）",
+  "TOKEN_A7": "專家G（自行替換）",
+  "TOKEN_A8": "專家H（自行替換）",
+  "TOKEN_A9": "專家I（自行替換）",
+  "TOKEN_B1": "專家J（自行替換）",
+  "TOKEN_B2": "專家K（自行替換）",
+  "TOKEN_B3": "專家L（自行替換）",
+  "TOKEN_B4": "專家M（自行替換）",
+  "TOKEN_B5": "專家N（自行替換）",
+  "TOKEN_B6": "專家O（自行替換）"
+};
+
+// ─────────────────────────────────────────────
+//  SURVEY DATA
+// ─────────────────────────────────────────────
+const SURVEY_DATA = [
+  {
+    id: "dim1",
+    title: "構面一：資訊需求辨識與媒體環境理解",
+    description: "此構面著重於館員對使用者資訊需求的覺察、界定、轉譯，以及對媒體生態、言論自由、所有權與商業模式的理解。",
+    items: [
+      {
+        code: "1.1",
+        competency: "能透過互動，將讀者模糊、籠統的需求轉譯為具體、可查找的資訊問題",
+        indicators: ["認知到媒體與資訊需求","瞭解媒體與資訊需求","定義與描述媒體與資訊","表達、陳述媒體與資訊需求","轉換媒體與資訊需求為行動"]
+      },
+      {
+        code: "1.2",
+        competency: "能辨識使用者對媒體與資訊需求的不同形式，並協助尋求適當資源",
+        indicators: ["界定媒體與資訊需求的範圍","找出達成目標所需要的不同格式","確認不同需求形式下，不同種類媒體與資訊的可用性及可及性","識別與媒體和資訊需求相關的情境因素（背景、環境）"]
+      },
+      {
+        code: "1.3",
+        competency: "瞭解媒體與資訊素養的相關法規、自由使用、智慧財產及其媒體規範",
+        indicators: ["瞭解關於媒體與資訊的相關法規","瞭解媒體與資訊的可及性及自由使用的相關議題","瞭解智慧財產相關議題"]
+      },
+      {
+        code: "1.4",
+        competency: "瞭解媒體業的生態、所有權與商業模式，以及其與資訊內容的關係",
+        indicators: ["瞭解媒體的生態與類型","瞭解媒體業所有權的相關議題","瞭解媒體業的商業模式與廣告","瞭解媒體所有權與商業模式如何影響資訊內容"]
+      }
+    ]
+  },
+  {
+    id: "dim2",
+    title: "構面二：資訊與媒體取用及檢索",
+    description: "此構面強調館員能有效運用各類檢索策略、工具與系統，協助使用者找到適切的資訊與媒體資源。",
+    items: [
+      {
+        code: "2.1",
+        competency: "能規劃與執行有效的資訊檢索策略，並活用各類資訊工具",
+        indicators: ["規劃媒體與資訊的檢索策略","建構媒體與資訊的有效查詢","使用資訊的檢索工具","使用進階的資訊與媒體取用工具"]
+      },
+      {
+        code: "2.2",
+        competency: "熟悉各類媒體與資訊系統、資料庫與檢索介面的操作",
+        indicators: ["操作圖書館館藏目錄、資料庫與電子資源系統","有效使用線上資料庫或圖書館資料庫","有效使用搜尋引擎","辨識並取用書目資訊"]
+      },
+      {
+        code: "2.3",
+        competency: "能辨識多元資訊來源，並協助使用者取用不同格式的媒體與資訊資源",
+        indicators: ["確認最佳的資訊與媒體來源","取用各種格式的媒體與資訊","組織和管理媒體與資訊資源及其取用"]
+      }
+    ]
+  },
+  {
+    id: "dim3",
+    title: "構面三：資訊與媒體評估及查核",
+    description: "此構面聚焦於館員對資訊與媒體內容之真偽辨識、來源查核、批判性評估能力，以及對演算法、過濾機制的認識。",
+    items: [
+      {
+        code: "3.1",
+        competency: "能批判性地評估資訊與媒體的品質、可信度與相關性",
+        indicators: ["評估媒體與資訊的品質","評估媒體與資訊的相關性","評估媒體與資訊的可信度","評估媒體與資訊的貨幣性（時效性）","評估媒體與資訊的完整性"]
+      },
+      {
+        code: "3.2",
+        competency: "能辨識假新聞、錯誤資訊、深偽技術及其傳播模式",
+        indicators: ["辨識假新聞、錯誤資訊（misinformation）及不實資訊（disinformation）","辨識深偽技術（Deepfake）製作的內容","瞭解假新聞與不實資訊的傳播模式與機制"]
+      },
+      {
+        code: "3.3",
+        competency: "熟悉媒體評級制度與資訊內容分類系統",
+        indicators: ["瞭解各類媒體評級制度（如電影、遊戲分級）","瞭解資訊內容分類與標記系統"]
+      },
+      {
+        code: "3.4",
+        competency: "瞭解演算法推薦機制、資訊過濾泡與回聲室效應",
+        indicators: ["瞭解演算法推薦與個人化資訊過濾機制","認識資訊過濾泡（filter bubble）現象","認識回聲室（echo chamber）效應","能向使用者說明並協助其突破資訊同溫層"]
+      }
+    ]
+  },
+  {
+    id: "dim4",
+    title: "構面四：資訊與媒體使用及應用",
+    description: "此構面著重於館員能有效運用與整合資訊及媒體，包含資料管理、數位工具應用與對 AI 生成內容的認識。",
+    items: [
+      {
+        code: "4.1",
+        competency: "能有效組織、整合與管理所蒐集的資訊與媒體資源",
+        indicators: ["組織媒體與資訊資源","整合不同類型的媒體與資訊","管理媒體與資訊資源","應用參考管理工具（如 Zotero、EndNote）"]
+      },
+      {
+        code: "4.2",
+        competency: "能善用數位工具與科技協助資訊服務與利用者教育",
+        indicators: ["善用數位工具輔助資訊服務","運用科技進行利用者教育與推廣","熟悉各類數位平台的功能與限制"]
+      },
+      {
+        code: "4.3",
+        competency: "瞭解 AI 生成內容（AIGC）的特性及其在資訊服務中的應用與限制",
+        indicators: ["瞭解 AI 生成內容（AIGC）的定義與類型","辨識 AI 生成內容的特徵與潛在風險","評估 AIGC 在圖書館服務中的應用可行性"]
+      }
+    ]
+  },
+  {
+    id: "dim5",
+    title: "構面五：資訊與媒體創作及傳播",
+    description: "此構面強調館員具備創作媒體與資訊內容的能力，並能負責任地散播與分享知識。",
+    items: [
+      {
+        code: "5.1",
+        competency: "能規劃、製作與發布適切的資訊與媒體內容",
+        indicators: ["規劃媒體與資訊內容","製作多元格式的媒體與資訊內容","發布與散播媒體與資訊內容","評估已發布內容的效果與影響"]
+      },
+      {
+        code: "5.2",
+        competency: "能運用社群媒體與數位平台進行知識推廣與館務行銷",
+        indicators: ["運用社群媒體進行圖書館推廣","利用數位平台進行館務行銷","管理圖書館的線上社群與互動"]
+      },
+      {
+        code: "5.3",
+        competency: "瞭解資訊散播的倫理規範與著作權責任",
+        indicators: ["遵守資訊散播的相關倫理規範","正確引用與標示資訊來源","瞭解著作權對資訊創作與散播的限制"]
+      }
+    ]
+  },
+  {
+    id: "dim6",
+    title: "構面六：資訊與媒體倫理及社會責任",
+    description: "此構面關注館員對資訊倫理、隱私權、資訊平等及社會責任的理解與實踐。",
+    items: [
+      {
+        code: "6.1",
+        competency: "理解資訊倫理與媒體倫理的核心原則",
+        indicators: ["瞭解資訊倫理的基本原則","瞭解媒體倫理的核心規範","在服務中落實資訊倫理"]
+      },
+      {
+        code: "6.2",
+        competency: "重視使用者隱私與個人資料保護",
+        indicators: ["保護使用者個人資料與隱私","瞭解個資法等相關法規","建立符合隱私保護的服務流程"]
+      },
+      {
+        code: "6.3",
+        competency: "促進資訊公平近用與縮減數位落差",
+        indicators: ["認識數位落差的成因與影響","提供平等的資訊取用服務","協助弱勢族群提升數位與資訊能力"]
+      }
+    ]
+  },
+  {
+    id: "dim7",
+    title: "構面七：媒體與資訊素養推廣與教育",
+    description: "此構面強調館員作為 MIL 推廣者與教育者的角色，能設計並執行素養課程與活動。",
+    items: [
+      {
+        code: "7.1",
+        competency: "能設計與執行媒體與資訊素養教育課程或活動",
+        indicators: ["設計 MIL 相關課程或活動","執行 MIL 教育活動","評估 MIL 活動的成效"]
+      },
+      {
+        code: "7.2",
+        competency: "能針對不同族群（樂齡、學生、弱勢等）進行差異化 MIL 推廣",
+        indicators: ["瞭解不同族群的媒體與資訊素養需求","針對特定族群設計差異化課程","運用適切的教學方法與媒介"]
+      },
+      {
+        code: "7.3",
+        competency: "能與學校、社區、政府機構合作推廣 MIL",
+        indicators: ["建立跨機構的 MIL 合作夥伴關係","共同規劃與執行 MIL 推廣計畫","評估跨機構合作的效益"]
+      }
+    ]
+  },
+  {
+    id: "dim8",
+    title: "構面八：專業發展與研究能力",
+    description: "此構面關注館員的持續專業學習、研究能力，以及對 MIL 領域發展趨勢的掌握。",
+    items: [
+      {
+        code: "8.1",
+        competency: "持續關注並更新 MIL 相關知識與實務技能",
+        indicators: ["主動追蹤 MIL 領域的最新發展","參與專業研習、研討會或社群","反思並更新個人 MIL 知能"]
+      },
+      {
+        code: "8.2",
+        competency: "具備基礎研究能力，能進行圖書館實務研究",
+        indicators: ["瞭解基礎研究方法","能進行圖書館實務相關的小型研究","能閱讀與應用研究文獻"]
+      },
+      {
+        code: "8.3",
+        competency: "能運用資料分析工具評估服務效益",
+        indicators: ["瞭解基礎統計與資料分析概念","運用工具分析圖書館服務數據","根據分析結果調整服務策略"]
+      },
+      {
+        code: "8.4",
+        competency: "能在組織內部推動 MIL 文化與知識管理",
+        indicators: ["在館內推動 MIL 相關知識分享","建立館員 MIL 知能的組織學習機制","促進館際間的 MIL 知識交流"]
+      }
+    ]
+  }
+];
+
+// ─────────────────────────────────────────────
+//  STATE
+// ─────────────────────────────────────────────
+let currentToken = null;
+let expertName = null;
+let indicatorSnapshots = {}; // key: "code-idx" => original text
+let totalItems = 0;
+
+// ─────────────────────────────────────────────
+//  INIT
+// ─────────────────────────────────────────────
+function init() {
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get("token") || "";
+  const name = EXPERT_TOKENS[token];
+
+  if (!name) {
+    document.getElementById("invalid-page").style.display = "flex";
+    return;
+  }
+
+  currentToken = token;
+  expertName = name;
+  document.getElementById("app-root").style.display = "block";
+  document.getElementById("expert-badge").textContent = name;
+
+  totalItems = SURVEY_DATA.reduce((s, d) => s + d.items.length, 0);
+  updateProgress();
+
+  buildSidebar();
+  buildSurvey();
+  setupSubmit();
+  setupHamburger();
+  setupScrollSpy();
+}
+
+// ─────────────────────────────────────────────
+//  BUILD SIDEBAR
+// ─────────────────────────────────────────────
+function buildSidebar() {
+  const nav = document.getElementById("dim-nav");
+  nav.innerHTML = "";
+  const label = document.createElement("span");
+  label.className = "nav-dim-label";
+  label.textContent = "構面導覽";
+  nav.appendChild(label);
+
+  SURVEY_DATA.forEach((dim, i) => {
+    const btn = document.createElement("button");
+    btn.className = "nav-dim-btn";
+    btn.dataset.dim = dim.id;
+    btn.innerHTML = `<span class="nav-dim-num">${i+1}</span><span>${dim.title.replace(/^構面[一二三四五六七八]：/, "")}</span>`;
+    btn.addEventListener("click", () => {
+      const el = document.getElementById("section-" + dim.id);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      closeSidebar();
+    });
+    nav.appendChild(btn);
+  });
+}
+
+// ─────────────────────────────────────────────
+//  BUILD SURVEY
+// ─────────────────────────────────────────────
+function buildSurvey() {
+  const container = document.getElementById("survey-sections");
+  container.innerHTML = "";
+
+  SURVEY_DATA.forEach(dim => {
+    const section = document.createElement("div");
+    section.className = "dim-section";
+    section.id = "section-" + dim.id;
+
+    // dim header
+    const hdr = document.createElement("div");
+    hdr.className = "dim-header";
+    hdr.innerHTML = `<h2>${dim.title}</h2><p>${dim.description}</p>`;
+    section.appendChild(hdr);
+
+    // items
+    dim.items.forEach(item => {
+      section.appendChild(buildItemCard(item));
+    });
+
+    // dim comment
+    const dimCmt = document.createElement("div");
+    dimCmt.className = "dim-comment-section";
+    dimCmt.innerHTML = `<span class="field-label">💬 本構面其他意見（選填）</span>
+      <textarea class="comment-area" id="dim-comment-${dim.id}" placeholder="如有對整體構面的意見或建議，請填寫於此…" rows="3"></textarea>`;
+    section.appendChild(dimCmt);
+
+    container.appendChild(section);
+  });
+}
+
+function buildItemCard(item) {
+  const card = document.createElement("div");
+  card.className = "item-card";
+  card.id = "card-" + item.code;
+
+  // code + competency
+  card.innerHTML = `<span class="item-code">題 ${item.code}</span>
+    <div class="item-competency">館員知能：${item.competency}</div>
+    <span class="field-label">⭐ 本研究彙整之指標（可直接修改文字）</span>`;
+
+  // indicators
+  const list = document.createElement("div");
+  list.className = "indicators-list";
+  item.indicators.forEach((text, idx) => {
+    const key = `${item.code}-${idx}`;
+    indicatorSnapshots[key] = text;
+
+    const row = document.createElement("div");
+    row.className = "indicator-item";
+    row.innerHTML = `<span class="indicator-num">${idx+1}</span>`;
+
+    const div = document.createElement("div");
+    div.className = "indicator-text";
+    div.contentEditable = "true";
+    div.dataset.key = key;
+    div.textContent = text;
+    div.setAttribute("role", "textbox");
+    div.setAttribute("aria-label", `指標 ${item.code} 第 ${idx+1} 項`);
+
+    div.addEventListener("input", () => handleIndicatorInput(div, key));
+
+    const badge = document.createElement("span");
+    badge.className = "modified-badge";
+    badge.textContent = "已修改";
+
+    row.appendChild(div);
+    row.appendChild(badge);
+    list.appendChild(row);
+  });
+  card.appendChild(list);
+
+  // score
+  const scoreGroup = document.createElement("div");
+  scoreGroup.className = "score-group";
+  scoreGroup.id = `score-group-${item.code}`;
+  scoreGroup.innerHTML = `<span class="field-label">📊 知能指標重要程度（7 = 最高，1 = 最低）</span>`;
+  const scale = document.createElement("div");
+  scale.className = "score-scale";
+  for (let s = 7; s >= 1; s--) {
+    const lbl = document.createElement("label");
+    const radio = document.createElement("input");
+    radio.type = "radio";
+    radio.name = `score-${item.code}`;
+    radio.value = s;
+    radio.addEventListener("change", () => updateProgress());
+    const btn = document.createElement("span");
+    btn.className = "score-btn";
+    btn.textContent = s;
+    lbl.appendChild(radio);
+    lbl.appendChild(btn);
+    scale.appendChild(lbl);
+  }
+  const hint = document.createElement("div");
+  hint.className = "score-hint";
+  hint.innerHTML = `<span>← 最重要（7）</span><span>最不重要（1）→</span>`;
+  scoreGroup.appendChild(scale);
+  scoreGroup.appendChild(hint);
+  card.appendChild(scoreGroup);
+
+  // action checkboxes
+  const actionGroup = document.createElement("div");
+  actionGroup.className = "action-group";
+  actionGroup.innerHTML = `
+    <label class="action-check">
+      <input type="checkbox" id="chk-modify-${item.code}"> ☑ 修改（需填寫意見說明）
+    </label>
+    <label class="action-check delete-check">
+      <input type="checkbox" id="chk-delete-${item.code}"> ☑ 刪除（需填寫意見說明）
+    </label>`;
+  card.appendChild(actionGroup);
+
+  // delete style toggle
+  card.querySelector(`#chk-delete-${item.code}`).addEventListener("change", e => {
+    if (e.target.checked) card.classList.add("is-deleted");
+    else card.classList.remove("is-deleted");
+  });
+
+  // comment
+  const commentWrap = document.createElement("div");
+  commentWrap.innerHTML = `<span class="field-label">📝 意見說明</span>
+    <textarea class="comment-area" id="comment-${item.code}" placeholder="請填寫您的修改或刪除理由，或其他補充意見…" rows="3"></textarea>`;
+  card.appendChild(commentWrap);
+
+  return card;
+}
+
+function handleIndicatorInput(div, key) {
+  const original = indicatorSnapshots[key];
+  const current = div.textContent.trim();
+  if (current !== original) {
+    div.classList.add("is-modified");
+  } else {
+    div.classList.remove("is-modified");
+  }
+}
+
+// ─────────────────────────────────────────────
+//  PROGRESS
+// ─────────────────────────────────────────────
+function updateProgress() {
+  let scored = 0;
+  SURVEY_DATA.forEach(dim => {
+    dim.items.forEach(item => {
+      const checked = document.querySelector(`input[name="score-${item.code}"]:checked`);
+      if (checked) scored++;
+    });
+  });
+  const pct = totalItems > 0 ? Math.round((scored / totalItems) * 100) : 0;
+  document.getElementById("progress-bar").style.width = pct + "%";
+  document.getElementById("progress-text").textContent = `${scored} / ${totalItems}`;
+}
+
+// ─────────────────────────────────────────────
+//  SCROLL SPY
+// ─────────────────────────────────────────────
+function setupScrollSpy() {
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id.replace("section-", "");
+        document.querySelectorAll(".nav-dim-btn").forEach(b => b.classList.remove("active"));
+        const btn = document.querySelector(`.nav-dim-btn[data-dim="${id}"]`);
+        if (btn) btn.classList.add("active");
+      }
+    });
+  }, { rootMargin: "-30% 0px -60% 0px" });
+
+  SURVEY_DATA.forEach(dim => {
+    const el = document.getElementById("section-" + dim.id);
+    if (el) observer.observe(el);
+  });
+}
+
+// ─────────────────────────────────────────────
+//  HAMBURGER
+// ─────────────────────────────────────────────
+function setupHamburger() {
+  const btn = document.getElementById("hamburger");
+  const sidebar = document.getElementById("sidebar");
+  const overlay = document.getElementById("sidebar-overlay");
+  btn.addEventListener("click", () => {
+    sidebar.classList.toggle("open");
+    overlay.classList.toggle("open");
+  });
+  overlay.addEventListener("click", closeSidebar);
+}
+function closeSidebar() {
+  document.getElementById("sidebar").classList.remove("open");
+  document.getElementById("sidebar-overlay").classList.remove("open");
+}
+
+// ─────────────────────────────────────────────
+//  SUBMIT
+// ─────────────────────────────────────────────
+function setupSubmit() {
+  document.getElementById("submit-btn").addEventListener("click", handleSubmitClick);
+  document.getElementById("modal-cancel").addEventListener("click", () => {
+    document.getElementById("confirm-modal").classList.remove("open");
+  });
+  document.getElementById("modal-confirm").addEventListener("click", doSubmit);
+}
+
+function handleSubmitClick() {
+  // Validate scores
+  let allScored = true;
+  SURVEY_DATA.forEach(dim => {
+    dim.items.forEach(item => {
+      const scoreGroup = document.getElementById(`score-group-${item.code}`);
+      const checked = document.querySelector(`input[name="score-${item.code}"]:checked`);
+      if (!checked) {
+        allScored = false;
+        scoreGroup.classList.add("missing-score");
+      } else {
+        scoreGroup.classList.remove("missing-score");
+      }
+    });
+  });
+
+  if (!allScored) {
+    showError("請完成所有題項的重要程度評分（共 " + totalItems + " 題）後再送出。");
+    const firstMissing = document.querySelector(".missing-score");
+    if (firstMissing) firstMissing.scrollIntoView({ behavior: "smooth", block: "center" });
+    return;
+  }
+
+  // Validate comments for modify/delete
+  let commentOk = true;
+  SURVEY_DATA.forEach(dim => {
+    dim.items.forEach(item => {
+      const chkModify = document.getElementById(`chk-modify-${item.code}`);
+      const chkDelete = document.getElementById(`chk-delete-${item.code}`);
+      const comment = document.getElementById(`comment-${item.code}`);
+      if ((chkModify.checked || chkDelete.checked) && !comment.value.trim()) {
+        comment.classList.add("required-missing");
+        commentOk = false;
+      } else {
+        comment.classList.remove("required-missing");
+      }
+    });
+  });
+  if (!commentOk) {
+    showError("勾選「修改」或「刪除」的題項，請填寫對應的意見說明。");
+    const firstMissing = document.querySelector(".required-missing");
+    if (firstMissing) firstMissing.scrollIntoView({ behavior: "smooth", block: "center" });
+    return;
+  }
+
+  // Collect stats
+  const { modCount, delCount } = collectStats();
+  document.getElementById("stat-modified").textContent = modCount;
+  document.getElementById("stat-deleted").textContent = delCount;
+  document.getElementById("stat-scored").textContent = totalItems;
+
+  document.getElementById("confirm-modal").classList.add("open");
+}
+
+function collectStats() {
+  let modCount = 0, delCount = 0;
+  SURVEY_DATA.forEach(dim => {
+    dim.items.forEach(item => {
+      if (document.getElementById(`chk-modify-${item.code}`).checked) modCount++;
+      if (document.getElementById(`chk-delete-${item.code}`).checked) delCount++;
+    });
+  });
+  return { modCount, delCount };
+}
+
+async function doSubmit() {
+  const confirmBtn = document.getElementById("modal-confirm");
+  confirmBtn.disabled = true;
+  confirmBtn.textContent = "送出中…";
+
+  const payload = buildPayload();
+
+  try {
+    const resp = await fetch(GAS_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    const data = await resp.json();
+    if (data.status === "success") {
+      document.getElementById("confirm-modal").classList.remove("open");
+      document.getElementById("success-modal").classList.add("open");
+      document.getElementById("submit-btn").disabled = true;
+    } else {
+      throw new Error("Server returned non-success status");
+    }
+  } catch (err) {
+    showError("送出失敗，請稍後再試。（" + err.message + "）");
+  } finally {
+    confirmBtn.disabled = false;
+    confirmBtn.textContent = "確認送出";
+    document.getElementById("confirm-modal").classList.remove("open");
+  }
+}
+
+function buildPayload() {
+  const responses = [];
+  const dimension_comments = {};
+
+  SURVEY_DATA.forEach(dim => {
+    const dimComment = document.getElementById(`dim-comment-${dim.id}`);
+    dimension_comments[dim.id] = dimComment ? dimComment.value.trim() : "";
+
+    dim.items.forEach(item => {
+      const scoreEl = document.querySelector(`input[name="score-${item.code}"]:checked`);
+      const score = scoreEl ? parseInt(scoreEl.value) : null;
+      const chkModify = document.getElementById(`chk-modify-${item.code}`).checked;
+      const chkDelete = document.getElementById(`chk-delete-${item.code}`).checked;
+      const comment = document.getElementById(`comment-${item.code}`).value.trim();
+
+      let action = "keep";
+      if (chkDelete) action = "delete";
+      else if (chkModify) action = "modify";
+
+      // collect indicators
+      const indicators = [];
+      item.indicators.forEach((_, idx) => {
+        const key = `${item.code}-${idx}`;
+        const divs = document.querySelectorAll(`.indicator-text[data-key="${key}"]`);
+        const modifiedText = divs.length ? divs[0].textContent.trim() : item.indicators[idx];
+        const originalText = indicatorSnapshots[key];
+        const isModified = modifiedText !== originalText;
+        indicators.push({ index: idx, original_text: originalText, modified_text: modifiedText, is_modified: isModified });
+      });
+
+      responses.push({ item_code: item.code, score, action, comment, indicators });
+    });
+  });
+
+  return {
+    token: currentToken,
+    expert_name: expertName,
+    submitted_at: new Date().toISOString(),
+    responses,
+    dimension_comments
+  };
+}
+
+// ─────────────────────────────────────────────
+//  UTILS
+// ─────────────────────────────────────────────
+function showError(msg) {
+  const banner = document.getElementById("error-banner");
+  banner.textContent = msg;
+  banner.classList.add("show");
+  setTimeout(() => banner.classList.remove("show"), 5000);
+}
+
+// ─────────────────────────────────────────────
+//  START
+// ─────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>
