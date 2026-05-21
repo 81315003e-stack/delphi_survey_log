@@ -1025,20 +1025,30 @@ function buildItemCard(item) {
   // action checkboxes
   const actionGroup = document.createElement("div");
   actionGroup.className = "action-group";
-  actionGroup.innerHTML = `
-    <label class="action-check">
-      <input type="checkbox" id="chk-modify-${item.code}"> ☑ 修改（需填寫意見說明）
-    </label>
-    <label class="action-check delete-check">
-      <input type="checkbox" id="chk-delete-${item.code}"> ☑ 刪除（需填寫意見說明）
-    </label>`;
-  card.appendChild(actionGroup);
 
-  // delete style toggle
-  card.querySelector(`#chk-delete-${item.code}`).addEventListener("change", e => {
+  const lblModify = document.createElement("label");
+  lblModify.className = "action-check";
+  const chkModifyEl = document.createElement("input");
+  chkModifyEl.type = "checkbox";
+  chkModifyEl.id = "chk-modify-" + item.code;
+  lblModify.appendChild(chkModifyEl);
+  lblModify.appendChild(document.createTextNode(" ☑ 修改（需填寫意見說明）"));
+
+  const lblDelete = document.createElement("label");
+  lblDelete.className = "action-check delete-check";
+  const chkDeleteEl = document.createElement("input");
+  chkDeleteEl.type = "checkbox";
+  chkDeleteEl.id = "chk-delete-" + item.code;
+  chkDeleteEl.addEventListener("change", function(e) {
     if (e.target.checked) card.classList.add("is-deleted");
     else card.classList.remove("is-deleted");
   });
+  lblDelete.appendChild(chkDeleteEl);
+  lblDelete.appendChild(document.createTextNode(" ☑ 刪除（需填寫意見說明）"));
+
+  actionGroup.appendChild(lblModify);
+  actionGroup.appendChild(lblDelete);
+  card.appendChild(actionGroup);
 
   // comment
   const commentWrap = document.createElement("div");
@@ -1276,7 +1286,7 @@ function showError(msg) {
 // ─────────────────────────────────────────────
 //  START
 // ─────────────────────────────────────────────
-init();
+if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", init); } else { init(); }
 </script>
 </body>
 </html>
